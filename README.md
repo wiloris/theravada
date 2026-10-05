@@ -8,6 +8,12 @@ npm run dev      # http://localhost:4321
 npm run build    # готовый сайт в dist/
 ```
 
+## Публикация
+
+Сайт живёт на GitHub Pages: **https://wiloris.github.io/theravada/**. Каждый `git push` в ветку `main` сам пересобирает и выкладывает сайт (`.github/workflows/deploy.yml`), ход сборки виден во вкладке Actions репозитория.
+
+Внутренние ссылки в текстах пишите как обычно, от корня: `[глава](/section-2/)` — адрес подпапки подставится сам. Локально (`npm run dev`) сайт открывается по адресу http://localhost:4321/theravada/.
+
 ## Устройство книги
 
 | Что | Где | Адрес |
