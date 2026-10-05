@@ -1,0 +1,12 @@
+---
+/** Авторский комментарий — отдельный голос автора внутри статьи. */
+interface Props {
+  label?: string;
+}
+const { label = 'Комментарий автора' } = Astro.props;
+---
+
+<aside class="author-note">
+  <p class="author-note__label">{label}</p>
+  <div class="author-note__body"><slot /></div>
+</aside>

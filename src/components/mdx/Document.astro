@@ -1,0 +1,24 @@
+---
+/**
+ * Исторический материал: выписка из документа, надпись, архивный текст.
+ *
+ *   <Document source="Архив, фонд, дело, лист" date="1853">Текст документа…</Document>
+ */
+interface Props {
+  source?: string;
+  date?: string;
+}
+const { source, date } = Astro.props;
+---
+
+<figure class="document">
+  <div class="document__sheet"><slot /></div>
+  {
+    (source || date) && (
+      <figcaption class="document__source">
+        {date && <span>{date}</span>}
+        {source && <span>{source}</span>}
+      </figcaption>
+    )
+  }
+</figure>

@@ -1,0 +1,94 @@
+---
+/** Разворот статьи: используется и для статей глав, и для авторских материалов. */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import Base from './Base.astro';
+import { SITE } from '../config';
+import { formatDate } from '../lib/book';
+
+interface Link {
+  href: string;
+  label: string;
+  title: string;
+}
+interface Props {
+  title: string;
+  subtitle?: string;
+  excerpt?: string;
+  date?: Date;
+  cover?: ImageMetadata;
+  coverAlt?: string;
+  coverCaption?: string;
+  /** Надпись над заголовком: «Глава II · Раздел 2» */
+  kicker: { href: string; text: string };
+  accent?: string;
+  prev?: Link;
+  next?: Link;
+  back: { href: string; label: string };
+}
+const { title, subtitle, excerpt, date, cover, coverAlt, coverCaption, kicker, accent, prev, next, back } =
+  Astro.props;
+---
+
+<Base title={title} description={excerpt} accent={accent}>
+  <article class="article">
+    <header class="article__head">
+      <a class="eyebrow article__kicker" href={kicker.href}>{kicker.text}</a>
+      <h1 class="article__title">{title}</h1>
+      {subtitle && <p class="article__subtitle">{subtitle}</p>}
+      <p class="article__meta">
+        <span>{SITE.author}</span>
+        {date && <time datetime={date.toISOString()}>{formatDate(date)}</time>}
+      </p>
+      <div class="ornament" aria-hidden="true"></div>
+    </header>
+
+    {
+      cover && (
+        <figure class="fig fig--wide article__cover">
+          <button class="fig__zoom" type="button" data-lightbox aria-label={`Открыть изображение: ${coverAlt ?? title}`}>
+            <Image
+              src={cover}
+              alt={coverAlt ?? ''}
+              widths={[720, 1080, 1440, 1920].filter((w) => w <= cover.width)}
+              sizes="(min-width: 66rem) 62rem, 100vw"
+              layout="none"
+              loading="eager"
+            />
+          </button>
+          {coverCaption && (
+            <figcaption>
+              <span class="fig__caption">{coverCaption}</span>
+            </figcaption>
+          )}
+        </figure>
+      )
+    }
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    <nav class="article__pager" aria-label="Соседние материалы">
+      {
+        prev ? (
+          <a class="pager-link pager-link--prev" href={prev.href}>
+            <span class="eyebrow">← {prev.label}</span>
+            <span class="pager-link__title">{prev.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next && (
+          <a class="pager-link pager-link--next" href={next.href}>
+            <span class="eyebrow">{next.label} →</span>
+            <span class="pager-link__title">{next.title}</span>
+          </a>
+        )
+      }
+    </nav>
+    <p class="article__back"><a href={back.href}>{back.label}</a></p>
+  </article>
+</Base>

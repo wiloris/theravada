@@ -1,0 +1,25 @@
+---
+import { SITE } from '../config';
+import { url } from '../lib/book';
+
+interface Props {
+  /** Шапка лежит поверх обложки (светлый текст, прозрачный фон до прокрутки) */
+  overlay?: boolean;
+}
+const { overlay = false } = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<header class="site-header" data-overlay={overlay ? '' : undefined}>
+  <a class="site-header__brand" href={url('/')}>
+    <span class="site-header__title">{SITE.title}</span>
+    <span class="site-header__author">{SITE.author}</span>
+  </a>
+  <nav class="site-header__nav" aria-label="Основная навигация">
+    <a href={url('/author/')} aria-current={path.startsWith(url('/author')) ? 'page' : undefined}>От автора</a>
+    <button type="button" class="site-header__toc" data-toc-open aria-haspopup="dialog">
+      <span class="site-header__toc-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>Оглавление</span>
+    </button>
+  </nav>
+</header>

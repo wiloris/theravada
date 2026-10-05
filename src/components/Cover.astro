@@ -1,0 +1,34 @@
+---
+/** Обложка во весь экран: главная и главы. */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+  image: ImageMetadata;
+  alt: string;
+  position?: string;
+  caption?: string;
+  variant?: 'home' | 'chapter';
+}
+const { image, alt, position = '50% 50%', caption, variant = 'chapter' } = Astro.props;
+---
+
+<section class={`cover cover--${variant}`}>
+  <div class="cover__media">
+    <Image
+      src={image}
+      alt={alt}
+      widths={[640, 960, 1280, 1600, 1920, 2560].filter((w) => w <= image.width * 1.01)}
+      sizes="100vw"
+      layout="none"
+      loading="eager"
+      fetchpriority="high"
+      style={`object-position:${position}`}
+    />
+  </div>
+  <div class="cover__frame" aria-hidden="true"></div>
+  <div class="cover__content">
+    <slot />
+  </div>
+  {caption && <p class="cover__caption">{caption}</p>}
+</section>

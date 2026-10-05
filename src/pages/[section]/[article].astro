@@ -1,0 +1,43 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import Article from '../../layouts/Article.astro';
+import { mdxComponents } from '../../components/mdx';
+import { getBook, getSectionArticles, articlePath, articleUrl, roman, sectionUrl, type Article as Entry, type Section } from '../../lib/book';
+
+export const getStaticPaths = (async () => {
+  const { sections } = await getBook();
+  const paths = [];
+  for (const section of sections) {
+    const articles = await getSectionArticles(section.id);
+    articles.forEach((article, i) =>
+      paths.push({
+        params: { section: section.id, article: articlePath(article).slug },
+        props: { article, section, prev: articles[i - 1], next: articles[i + 1] },
+      }),
+    );
+  }
+  return paths;
+}) satisfies GetStaticPaths;
+
+interface Props {
+  article: Entry;
+  section: Section;
+  prev?: Entry;
+  next?: Entry;
+}
+const { article, section, prev, next } = Astro.props;
+const { Content } = await render(article);
+const link = (a?: Entry, label = '') => a && { href: articleUrl(a), label, title: a.data.title };
+---
+
+<Article
+  {...article.data}
+  kicker={{ href: sectionUrl(section), text: `Глава ${roman(section.data.order)} · ${section.data.title}` }}
+  accent={section.data.accent}
+  prev={link(prev, 'Предыдущий материал')}
+  next={link(next, 'Следующий материал')}
+  back={{ href: sectionUrl(section), label: `Вернуться к главе ${roman(section.data.order)}` }}
+>
+  <Content components={mdxComponents} />
+</Article>

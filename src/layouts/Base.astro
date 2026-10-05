@@ -1,0 +1,58 @@
+---
+import '@fontsource/cormorant-garamond/400.css';
+import '@fontsource/cormorant-garamond/400-italic.css';
+import '@fontsource/cormorant-garamond/500.css';
+import '@fontsource/cormorant-garamond/600.css';
+import '@fontsource-variable/literata/opsz.css';
+import '@fontsource-variable/literata/opsz-italic.css';
+import '@fontsource-variable/inter/wght.css';
+import '../styles/global.css';
+import { SITE } from '../config';
+import { url } from '../lib/book';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import TocDialog from '../components/TocDialog.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Страница начинается с обложки во весь экран */
+  overlayHeader?: boolean;
+  /** Акцентный цвет главы */
+  accent?: string;
+}
+const { title, description = SITE.description, overlayHeader = false, accent } = Astro.props;
+const fullTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} — ${SITE.subtitle}`;
+---
+
+<!doctype html>
+<html lang={SITE.lang} style={accent ? `--accent:${accent}` : undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">К содержанию</a>
+    <SiteHeader overlay={overlayHeader} />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter />
+    <TocDialog />
+
+    <dialog class="lightbox" data-lightbox-dialog aria-label="Просмотр изображения">
+      <button type="button" class="lightbox__close" data-lightbox-close aria-label="Закрыть">×</button>
+      <img alt="" />
+      <p class="lightbox__caption"></p>
+    </dialog>
+
+    <script>
+      import '../scripts/site';
+    </script>
+  </body>
+</html>

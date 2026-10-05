@@ -1,0 +1,60 @@
+---
+import { getEntry, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../config';
+import { getNotes, noteUrl, formatDate } from '../../lib/book';
+
+const about = await getEntry('pages', 'about');
+const { Content } = about ? await render(about) : { Content: null };
+const notes = await getNotes();
+---
+
+<Base title="От автора" description={`Авторские материалы: ${SITE.author}`}>
+  <div class="author-page">
+    <header class="page-head">
+      <p class="eyebrow">Вне глав</p>
+      <h1 class="page-head__title">От автора</h1>
+      <p class="page-head__lede">Предисловие, заметки на полях, дневники поездок и комментарии к книге.</p>
+      <div class="ornament" aria-hidden="true"></div>
+    </header>
+
+    <section class="materials" aria-labelledby="notes-title">
+      <header class="materials__head"><h2 id="notes-title" class="eyebrow">Авторские материалы</h2></header>
+      <ol class="materials__list">
+        {
+          notes.map((n, i) => (
+            <li class="material">
+              <a href={noteUrl(n)}>
+                <span class="material__num">{String(i + 1).padStart(2, '0')}</span>
+                <span class="material__text">
+                  <span class="material__title">{n.data.title}</span>
+                  {n.data.subtitle && <span class="material__subtitle">{n.data.subtitle}</span>}
+                  {n.data.excerpt && <span class="material__excerpt">{n.data.excerpt}</span>}
+                  {n.data.date && <span class="material__date">{formatDate(n.data.date)}</span>}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    {
+      about && Content && (
+        <section class="about" id="about" aria-labelledby="about-title">
+          {about.data.portrait && (
+            <Image class="about__portrait" src={about.data.portrait} alt={about.data.portraitAlt ?? SITE.author} width={480} layout="none" />
+          )}
+          <div>
+            <p class="eyebrow">{about.data.title}</p>
+            <h2 id="about-title" class="about__name">{SITE.author}</h2>
+            <div class="prose prose--flush">
+              <Content />
+            </div>
+          </div>
+        </section>
+      )
+    }
+  </div>
+</Base>

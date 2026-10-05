@@ -1,0 +1,34 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import Article from '../../layouts/Article.astro';
+import { mdxComponents } from '../../components/mdx';
+import { getNotes, noteUrl, url, type Note } from '../../lib/book';
+
+export const getStaticPaths = (async () => {
+  const notes = await getNotes();
+  return notes.map((note, i) => ({
+    params: { note: note.id },
+    props: { note, prev: notes[i + 1], next: notes[i - 1] },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  note: Note;
+  prev?: Note;
+  next?: Note;
+}
+const { note, prev, next } = Astro.props;
+const { Content } = await render(note);
+const link = (n?: Note, label = '') => n && { href: noteUrl(n), label, title: n.data.title };
+---
+
+<Article
+  {...note.data}
+  kicker={{ href: url('/author/'), text: 'От автора' }}
+  prev={link(prev, 'Ранее')}
+  next={link(next, 'Далее')}
+  back={{ href: url('/author/'), label: 'Все авторские материалы' }}
+>
+  <Content components={mdxComponents} />
+</Article>

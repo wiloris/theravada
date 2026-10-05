@@ -1,0 +1,54 @@
+---
+import { Image } from 'astro:assets';
+import { SITE } from '../config';
+import { getBook, getNotes, roman, sectionUrl, noteUrl, url } from '../lib/book';
+
+const book = await getBook();
+const notes = (await getNotes()).slice(0, 4);
+const current = Astro.url.pathname;
+---
+
+<dialog class="toc" data-toc aria-label="Оглавление">
+  <div class="toc__inner">
+    <div class="toc__head">
+      <a class="toc__title" href={url('/')}>{SITE.title}</a>
+      <button type="button" class="toc__close" data-toc-close>Закрыть <span aria-hidden="true">×</span></button>
+    </div>
+
+    <div class="toc__parts">
+      {
+        book.parts.map(({ part, sections }) => (
+          <section class="toc__part">
+            <p class="eyebrow">{part.data.label}</p>
+            <h2 class="toc__part-title">{part.data.title}</h2>
+            <ol class="toc__list">
+              {sections.map((s) => (
+                <li>
+                  <a
+                    href={sectionUrl(s)}
+                    aria-current={current.startsWith(sectionUrl(s)) ? 'page' : undefined}
+                    style={s.data.accent ? `--accent:${s.data.accent}` : undefined}
+                  >
+                    <span class="toc__thumb">
+                      <Image src={s.data.cover} alt="" width={240} style={`object-position:${s.data.coverPosition}`} layout="none" />
+                    </span>
+                    <span class="toc__num">{roman(s.data.order)}</span>
+                    <span class="toc__name">{s.data.title}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))
+      }
+      <section class="toc__part toc__part--author">
+        <p class="eyebrow">Вне глав</p>
+        <h2 class="toc__part-title"><a href={url('/author/')}>От автора</a></h2>
+        <ul class="toc__notes">
+          {notes.map((n) => <li><a href={noteUrl(n)}>{n.data.title}</a></li>)}
+          <li><a href={url('/author/#about')}>Об авторе</a></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</dialog>

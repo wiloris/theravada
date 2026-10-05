@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/book';
+---
+
+<Base title="Страница не найдена">
+  <header class="page-head page-head--center">
+    <p class="eyebrow">Ошибка 404</p>
+    <h1 class="page-head__title">Эта страница утрачена</h1>
+    <p class="page-head__lede">Как лист из старой рукописи. Начните с <a href={url('/#contents')}>оглавления</a>.</p>
+  </header>
+</Base>

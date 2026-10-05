@@ -1,0 +1,16 @@
+---
+import { SITE } from '../config';
+import { url } from '../lib/book';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <p class="site-footer__title">{SITE.title}</p>
+    <p class="site-footer__meta">© {SITE.author}, {year}</p>
+    <nav aria-label="Нижняя навигация">
+      <a href={url('/#contents')}>Оглавление</a>
+      <a href={url('/author/')}>От автора</a>
+    </nav>
+  </div>
+</footer>

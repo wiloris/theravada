@@ -1,0 +1,48 @@
+---
+/**
+ * Галерея. Пропорции изображений сохраняются.
+ *
+ *   <Gallery caption="Общая подпись" images={[
+ *     { src: img1, alt: '…', caption: '…' },
+ *     { src: img2, alt: '…' },
+ *   ]} />
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Item {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+}
+interface Props {
+  images: Item[];
+  caption?: string;
+  columns?: 2 | 3;
+}
+
+const { images, caption, columns = 3 } = Astro.props;
+---
+
+<figure class="gallery" style={`--cols:${columns}`}>
+  <ul class="gallery__grid">
+    {
+      images.map((img) => (
+        <li>
+          <button class="fig__zoom" type="button" data-lightbox aria-label={`Открыть изображение: ${img.alt}`}>
+            <Image
+              src={img.src}
+              alt={img.alt}
+              widths={[360, 540, 720, 1080].filter((w) => w <= img.src.width)}
+              sizes={`(min-width: 66rem) ${Math.round(62 / columns)}rem, 50vw`}
+              layout="none"
+              data-caption={img.caption}
+            />
+          </button>
+          {img.caption && <p class="gallery__item-caption">{img.caption}</p>}
+        </li>
+      ))
+    }
+  </ul>
+  {caption && <figcaption><span class="fig__caption">{caption}</span></figcaption>}
+</figure>

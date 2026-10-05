@@ -1,0 +1,91 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getEntry, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Cover from '../../components/Cover.astro';
+import { getBook, getSectionArticles, roman, articleUrl, sectionUrl, formatDate, type Section } from '../../lib/book';
+
+export const getStaticPaths = (async () => {
+  const { sections } = await getBook();
+  return sections.map((section, i) => ({
+    params: { section: section.id },
+    props: { section, prev: sections[i - 1], next: sections[i + 1] },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  section: Section;
+  prev?: Section;
+  next?: Section;
+}
+const { section, prev, next } = Astro.props;
+const { data } = section;
+const part = await getEntry(data.part);
+const articles = await getSectionArticles(section.id);
+const { Content } = await render(section);
+---
+
+<Base title={data.title} description={data.summary} overlayHeader accent={data.accent}>
+  <Cover image={data.cover} alt={data.coverAlt} position={data.coverPosition} caption={data.coverCaption}>
+    <p class="eyebrow cover__eyebrow">{part?.data.label} · Глава {roman(data.order)}</p>
+    <span class="cover__numeral" aria-hidden="true">{roman(data.order)}</span>
+    <h1 class="cover__title">{data.title}</h1>
+    <p class="cover__subtitle">{data.summary}</p>
+  </Cover>
+
+  <div class="chapter">
+    <div class="prose prose--intro reveal">
+      <Content />
+    </div>
+
+    <section class="materials reveal" aria-labelledby="materials-title">
+      <header class="materials__head">
+        <h2 id="materials-title" class="eyebrow">Материалы главы</h2>
+      </header>
+      {
+        articles.length ? (
+          <ol class="materials__list">
+            {articles.map((a, i) => (
+              <li class="material">
+                <a href={articleUrl(a)}>
+                  <span class="material__num">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="material__text">
+                    <span class="material__title">{a.data.title}</span>
+                    {a.data.subtitle && <span class="material__subtitle">{a.data.subtitle}</span>}
+                    {a.data.excerpt && <span class="material__excerpt">{a.data.excerpt}</span>}
+                    {a.data.date && <span class="material__date">{formatDate(a.data.date)}</span>}
+                  </span>
+                  {a.data.cover && (
+                    <span class="material__image">
+                      <Image src={a.data.cover} alt="" width={360} layout="none" />
+                    </span>
+                  )}
+                </a>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p class="materials__empty">Материалы этой главы готовятся.</p>
+        )
+      }
+    </section>
+  </div>
+
+  <nav class="chapter-pager" aria-label="Соседние главы">
+    {
+      [prev, next].map(
+        (s, i) =>
+          s && (
+            <a class={`chapter-pager__link chapter-pager__link--${i ? 'next' : 'prev'}`} href={sectionUrl(s)}>
+              <Image src={s.data.cover} alt="" widths={[800, 1400]} sizes="(min-width: 44rem) 50vw, 100vw" style={`object-position:${s.data.coverPosition}`} layout="none" />
+              <span class="chapter-pager__text">
+                <span class="eyebrow">{i ? 'Следующая глава' : 'Предыдущая глава'} · {roman(s.data.order)}</span>
+                <span class="chapter-pager__title">{s.data.title}</span>
+              </span>
+            </a>
+          ),
+      )
+    }
+  </nav>
+</Base>

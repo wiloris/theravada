@@ -1,0 +1,84 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Cover from '../components/Cover.astro';
+import { SITE } from '../config';
+import homeCover from '../assets/covers/home.jpg';
+import { getBook, getSectionArticles, roman, sectionUrl, url } from '../lib/book';
+
+const book = await getBook();
+const intros = await Promise.all(book.parts.map(({ part }) => render(part)));
+const counts = Object.fromEntries(
+  await Promise.all(book.sections.map(async (s) => [s.id, (await getSectionArticles(s.id)).length] as const)),
+);
+const plural = (n: number) =>
+  n % 10 === 1 && n % 100 !== 11 ? 'материал' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'материала' : 'материалов';
+---
+
+<Base overlayHeader>
+  <Cover image={homeCover} alt="Учитель, проповедующий ученикам под деревом; вдали ступа. Роспись." position="50% 28%" caption={SITE.coverCaption} variant="home">
+    <p class="eyebrow cover__eyebrow">Авторское исследование</p>
+    <h1 class="cover__title">{SITE.title}</h1>
+    <p class="cover__subtitle">{SITE.subtitle}</p>
+    <p class="cover__author">{SITE.author}</p>
+    <a class="cover__scroll" href="#contents">Открыть книгу <span aria-hidden="true">↓</span></a>
+  </Cover>
+
+  <section class="contents" id="contents" aria-labelledby="contents-title">
+    <header class="contents__head reveal">
+      <p class="eyebrow">Содержание</p>
+      <h2 id="contents-title" class="contents__title">Оглавление</h2>
+      <div class="ornament" aria-hidden="true"></div>
+    </header>
+
+    {
+      book.parts.map(({ part, sections }, i) => {
+        const { Content } = intros[i];
+        return (
+          <section class="contents__part reveal">
+            <header class="contents__part-head">
+              <p class="eyebrow">{part.data.label}</p>
+              <h3 class="contents__part-title">{part.data.title}</h3>
+              <div class="contents__part-intro">
+                <Content />
+              </div>
+            </header>
+            <ol class="chapters">
+              {sections.map((s) => (
+                <li class="chapter-row" style={s.data.accent ? `--accent:${s.data.accent}` : undefined}>
+                  <a href={sectionUrl(s)}>
+                    <span class="chapter-row__num">{roman(s.data.order)}</span>
+                    <span class="chapter-row__text">
+                      <span class="chapter-row__title">{s.data.title}</span>
+                      <span class="chapter-row__summary">{s.data.summary}</span>
+                      <span class="chapter-row__count">
+                        {counts[s.id] ? `${counts[s.id]} ${plural(counts[s.id])}` : 'Материалы готовятся'}
+                      </span>
+                    </span>
+                    <span class="chapter-row__image">
+                      <Image
+                        src={s.data.cover}
+                        alt=""
+                        widths={[480, 800]}
+                        sizes="(min-width: 52rem) 17rem, 100vw"
+                        style={`object-position:${s.data.coverPosition}`}
+                        layout="none"
+                      />
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
+        );
+      })
+    }
+
+    <aside class="contents__author reveal">
+      <p class="eyebrow">Вне глав</p>
+      <h3 class="contents__part-title"><a href={url('/author/')}>От автора</a></h3>
+      <p>Предисловие, заметки, дневники поездок и авторские комментарии к книге.</p>
+    </aside>
+  </section>
+</Base>
