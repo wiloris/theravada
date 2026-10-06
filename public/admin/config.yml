@@ -1,0 +1,248 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+#
+# Админка сайта: https://wiloris.github.io/theravada/admin/
+# Каждое сохранение — коммит в ветку main, после него GitHub Actions пересобирает сайт.
+# Поля повторяют схему из src/content.config.ts — меняя одно, поменяйте и другое.
+
+backend:
+  name: github
+  repo: wiloris/theravada
+  branch: main
+  commit_messages:
+    create: 'Админка: новый материал «{{slug}}» ({{collection}})'
+    update: 'Админка: правка «{{slug}}» ({{collection}})'
+    delete: 'Админка: удалён «{{slug}}» ({{collection}})'
+    uploadMedia: 'Админка: загружен файл {{path}}'
+    deleteMedia: 'Админка: удалён файл {{path}}'
+
+site_url: https://wiloris.github.io/theravada/
+display_url: https://wiloris.github.io/theravada/
+
+# Общая папка для файлов, не привязанных к материалу. Изображения статей и глав
+# хранятся рядом с текстом — это задано в самих коллекциях ниже.
+media_folder: src/assets/uploads
+public_folder: /src/assets/uploads   # не используется в текстах: у статей, глав и страниц свои папки
+
+# Адрес нового материала вводится латиницей (kak-ustroena-statya) один раз, при создании;
+# эти правила чистят то, что введено.
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  - name: section-1
+    label: Статьи · раздел 1
+    label_singular: Статья
+    description: Материалы главы /section-1/. Название главы задаётся в коллекции «Главы».
+    folder: src/content/articles/section-1
+    path: '{{slug}}/index'
+    extension: mdx
+    format: frontmatter
+    create: true
+    slug: { editable: [create] }
+    media_folder: ''
+    public_folder: ''
+    preview_path: section-1/{{slug}}/
+    summary: '{{title}}'
+    sortable_fields: [order, date, title]
+    # Общие поля статей и авторских материалов (articleSchema), ниже повторно используются через *article_fields.
+    fields: &article_fields
+      - { name: title, label: Заголовок, widget: string }
+      - { name: subtitle, label: Подзаголовок, widget: string, required: false }
+      - { name: excerpt, label: Краткое описание для оглавления, widget: text, required: false }
+      - { name: date, label: Дата, widget: datetime, type: date, required: false }
+      - name: order
+        label: Порядок в главе
+        hint: Без номера материалы идут по дате.
+        widget: number
+        value_type: int
+        required: false
+      - { name: cover, label: Изображение в начале статьи, widget: image, required: false }
+      - { name: coverAlt, label: Описание изображения (alt), widget: string, required: false }
+      - { name: coverCaption, label: Подпись к изображению, widget: string, required: false }
+      - name: draft
+        label: Черновик
+        hint: Черновик виден только при локальном запуске и не публикуется.
+        widget: boolean
+        default: false
+        required: false
+      - name: body
+        label: Текст
+        hint: >-
+          MDX: обычный Markdown плюс компоненты <Figure>, <Gallery>, <Document>, <AuthorNote>
+          (см. README). Изображения, загруженные сюда, лежат в папке статьи —
+          вставляйте их как ![описание](имя-файла.jpg).
+        widget: markdown
+        # Только «сырой» режим: визуальный редактор не понимает MDX и может испортить компоненты и import.
+        modes: [raw]
+
+  - name: section-2
+    label: Статьи · раздел 2
+    label_singular: Статья
+    description: Материалы главы /section-2/. Название главы задаётся в коллекции «Главы».
+    folder: src/content/articles/section-2
+    path: '{{slug}}/index'
+    extension: mdx
+    format: frontmatter
+    create: true
+    slug: { editable: [create] }
+    media_folder: ''
+    public_folder: ''
+    preview_path: section-2/{{slug}}/
+    summary: '{{title}}'
+    sortable_fields: [order, date, title]
+    fields: *article_fields
+
+  - name: section-3
+    label: Статьи · раздел 3
+    label_singular: Статья
+    description: Материалы главы /section-3/. Название главы задаётся в коллекции «Главы».
+    folder: src/content/articles/section-3
+    path: '{{slug}}/index'
+    extension: mdx
+    format: frontmatter
+    create: true
+    slug: { editable: [create] }
+    media_folder: ''
+    public_folder: ''
+    preview_path: section-3/{{slug}}/
+    summary: '{{title}}'
+    sortable_fields: [order, date, title]
+    fields: *article_fields
+
+  - name: section-4
+    label: Статьи · раздел 4
+    label_singular: Статья
+    description: Материалы главы /section-4/. Название главы задаётся в коллекции «Главы».
+    folder: src/content/articles/section-4
+    path: '{{slug}}/index'
+    extension: mdx
+    format: frontmatter
+    create: true
+    slug: { editable: [create] }
+    media_folder: ''
+    public_folder: ''
+    preview_path: section-4/{{slug}}/
+    summary: '{{title}}'
+    sortable_fields: [order, date, title]
+    fields: *article_fields
+
+  - name: section-5
+    label: Статьи · раздел 5
+    label_singular: Статья
+    description: Материалы главы /section-5/. Название главы задаётся в коллекции «Главы».
+    folder: src/content/articles/section-5
+    path: '{{slug}}/index'
+    extension: mdx
+    format: frontmatter
+    create: true
+    slug: { editable: [create] }
+    media_folder: ''
+    public_folder: ''
+    preview_path: section-5/{{slug}}/
+    summary: '{{title}}'
+    sortable_fields: [order, date, title]
+    fields: *article_fields
+
+  - name: section-6
+    label: Статьи · раздел 6
+    label_singular: Статья
+    description: Материалы главы /section-6/. Название главы задаётся в коллекции «Главы».
+    folder: src/content/articles/section-6
+    path: '{{slug}}/index'
+    extension: mdx
+    format: frontmatter
+    create: true
+    slug: { editable: [create] }
+    media_folder: ''
+    public_folder: ''
+    preview_path: section-6/{{slug}}/
+    summary: '{{title}}'
+    sortable_fields: [order, date, title]
+    fields: *article_fields
+
+  - name: notes
+    label: Авторские материалы
+    label_singular: Материал
+    description: Предисловия, дневники, заметки — /author/<адрес>/.
+    folder: src/content/notes
+    extension: mdx
+    format: frontmatter
+    create: true
+    slug: { editable: [create] }
+    media_folder: images
+    public_folder: images
+    preview_path: author/{{slug}}/
+    sortable_fields: [date, title]
+    fields: *article_fields
+
+  - name: sections
+    label: Главы
+    label_singular: Глава
+    description: Шесть глав книги. Адрес главы — имя файла, поэтому главы здесь не создаются и не удаляются.
+    folder: src/content/sections
+    extension: md
+    format: frontmatter
+    create: false
+    delete: false
+    media_folder: covers
+    public_folder: ./covers
+    preview_path: '{{slug}}/'
+    summary: '{{order}}. {{title}}'
+    sortable_fields: [order]
+    fields:
+      - { name: order, label: Порядок в книге, widget: number, value_type: int }
+      - name: part
+        label: Часть
+        widget: relation
+        collection: parts
+        value_field: '{{slug}}'
+        search_fields: [title, label]
+        display_fields: [label]
+      - { name: title, label: Название, widget: string }
+      - { name: summary, label: Краткое описание, widget: text }
+      - { name: cover, label: Обложка, widget: image }
+      - { name: coverAlt, label: Описание обложки (alt), widget: string }
+      - { name: coverCaption, label: Подпись на обложке, widget: string, required: false }
+      - name: coverPosition
+        label: Кадрирование обложки
+        hint: 'Какая часть кадра видна при обрезке, CSS object-position: "50% 40%".'
+        widget: string
+        default: '50% 50%'
+        required: false
+      - name: accent
+        label: Цвет главы
+        widget: color
+        required: false
+      - { name: body, label: Вступительный текст, widget: markdown }
+
+  - name: parts
+    label: Части
+    label_singular: Часть
+    folder: src/content/parts
+    extension: md
+    format: frontmatter
+    create: false
+    delete: false
+    summary: '{{label}} — {{title}}'
+    sortable_fields: [order]
+    fields:
+      - { name: order, label: Порядок, widget: number, value_type: int }
+      - { name: label, label: Подпись, hint: 'Например, «Часть первая».', widget: string }
+      - { name: title, label: Название, widget: string }
+      - { name: body, label: Вступление, widget: markdown }
+
+  - name: pages
+    label: Страницы
+    files:
+      - name: about
+        label: Об авторе
+        file: src/content/pages/about.md
+        media_folder: ''
+        public_folder: ''
+        preview_path: author/
+        fields:
+          - { name: title, label: Заголовок, widget: string }
+          - { name: portrait, label: Портрет, widget: image, required: false }
+          - { name: portraitAlt, label: Описание портрета (alt), widget: string, required: false }
+          - { name: body, label: Текст, widget: markdown }
